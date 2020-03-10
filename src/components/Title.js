@@ -1,11 +1,12 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState } from 'react';
+import { connect } from "react-redux";
+// import { initialState, titleReducer } from '../reducers/titleReducer';
 
-import { initialState, titleReducer } from '../reducers/titleReducer';
+import { toggleEditing, updateTitle } from "../actions/titleActions";
 
-const Title = () => {
+const Title = ({ editing, title, toggleEditing, updateTitle }) => {
   const [newTitleText, setNewTitleText] = useState();
-  const [state, dispatch] = useReducer(titleReducer, initialState);
-  console.log(state);
+  // const [state, dispatch] = useReducer(titleReducer, initialState);
 
   const handleChanges = e => {
     setNewTitleText(e.target.value);
@@ -13,12 +14,12 @@ const Title = () => {
 
   return (
     <div>
-      {!state.editing ? (
+      {!editing ? (
         <h1>
-          {state.title}{' '}
+          {title}{' '}
           <i
             className="far fa-edit"
-            onClick={() => dispatch({ type: 'TOGGLE_EDITING' })}
+            onClick={toggleEditing}
           />
         </h1>
       ) : (
@@ -31,9 +32,7 @@ const Title = () => {
             onChange={handleChanges}
           />
           <button
-            onClick={() =>
-              dispatch({ type: 'UPDATE_TITLE', payload: newTitleText })
-            }
+            onClick={() => updateTitle(newTitleText)}
           >
             Update title
           </button>
@@ -43,4 +42,19 @@ const Title = () => {
   );
 };
 
-export default Title;
+// Connect component to redux store using `connect` (a function that gets called twice -fx currying-: 1st - mapStateToProps and action creators, 2nd - takes component you want to connect to the state)
+// const mapStateToProps = state => {
+//   return {
+//     editing: state.editing,
+//     title: state.title
+//   };
+// };
+const mapStateToProps = ({editing, title}) => (
+  { editing, title }
+);
+
+
+export default connect(
+  mapStateToProps, 
+  { toggleEditing, updateTitle }
+)(Title);
